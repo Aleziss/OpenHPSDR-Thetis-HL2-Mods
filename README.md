@@ -106,13 +106,17 @@ Thetis.exe → Thetis_original.exe
 3. Copy the modified `Thetis.exe` from the [Releases](../../releases) page to the installation folder
 4. Launch Thetis normally
 
-> ⚠️ **Note:** Your antivirus may flag an unsigned executable. You may need to add an exception. The source code (`console.cs`) is provided for full transparency.
+> [!NOTE]
+> Your antivirus may flag an unsigned executable. You may need to add an exception. The source code (`console.cs`) is provided for full transparency.
+
+> [!NOTE]
+> It is possible that you will need to reconfigure Thetis (set skins, audio settings, etc) with this thetis.exe file, similar to a new install even though it is not. If you revert to your original thetis.exe file, all your previous settings should be there.
 
 ---
 
 ## Reapplying Changes to a New Version of Thetis
 
-If mi0bot releases a new version of Thetis, the changes can be reapplied to `console.cs` by:
+If MI0BOT releases a new version of Thetis, the changes can be reapplied to `console.cs` by:
 
 1. Locating the `AutoTuningHL2()` function
 2. Changing `const byte TIMEOUT = 50` to `const byte TIMEOUT = 125` and adding `const byte FAULT_TIMEOUT = 50`
