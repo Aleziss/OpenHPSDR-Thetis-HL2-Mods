@@ -25785,7 +25785,7 @@ namespace Thetis
                 case ProtocolEvent.RequestRF:
                     switch (auto_tuning)
                     {
-                        case AutoTuneState.Idle:          // MI0BOT: Hardware TUNE button pressed
+                        case AutoTuneState.Idle:          // VA2CST: Hardware TUNE button pressed
                             auto_tuning = AutoTuneState.Tuning;
                             tune_timeout = 0;
                             this.Invoke((Action)(() =>
