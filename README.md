@@ -126,6 +126,12 @@ Thetis.exe → Thetis_original.exe
 
 ---
 
+## Video demonstration
+
+You can see a demontration of the modded code [HERE](https://youtu.be/9eE7b4Y-6QY?si=WgPXGFOQaXzIzFvE)
+
+---
+
 ## Reapplying Changes to a New Version of Thetis
 
 If MI0BOT releases a new version of Thetis, the changes can be reapplied to `console.cs` by:
