@@ -29,6 +29,15 @@ const byte FAULT_TIMEOUT = 50;   // VA2CST: Fault message display timeout ~8s (s
 ```
 The `FAULT_TIMEOUT` constant was added to keep the fault message display duration unchanged at ~8 seconds, while the tuning timeout was extended to ~20 seconds.
 
+Fault timeout comparison:
+```csharp
+// BEFORE:
+if (fault_timeout++ >= TIMEOUT)
+
+// AFTER:
+if (fault_timeout++ >= FAULT_TIMEOUT)
+```
+
 ---
 
 ### Fix 2 — Hardware TUNE Button Support (without CTRL+TUN)
