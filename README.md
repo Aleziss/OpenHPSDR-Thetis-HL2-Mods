@@ -21,8 +21,8 @@ Two issues have been identified and resolved in `console.cs`:
 const byte TIMEOUT = 50;
 
 // AFTER:
-const byte TIMEOUT = 125;        // Auto tune timeout ~20s (was ~8s)
-const byte FAULT_TIMEOUT = 50;   // Fault message display timeout ~8s (unchanged)
+const byte TIMEOUT = 125;        // VA2CST: Auto tune timeout extended ~20s (was 50 = ~8s)
+const byte FAULT_TIMEOUT = 50;   // VA2CST: Fault message display timeout ~8s (separated from TIMEOUT)
 ```
 The `FAULT_TIMEOUT` constant was added to keep the fault message display duration unchanged at ~8 seconds, while the tuning timeout was extended to ~20 seconds.
 
