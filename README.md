@@ -1,6 +1,6 @@
 # OpenHPSDR Thetis HL2 Modifications — VA2CST
 
-This repository contains modifications to [MI0BOT's OpenHPSDR-Thetis](https://github.com/mi0bot/OpenHPSDR-Thetis) (v2.10.3.14), specifically targeting Hermes-Lite 2 users with an LDG automatic antenna tuner connected via the [N2ADR HL2 IO Board](https://github.com/jimahlstrom/HL2IOBoard) using my modded code [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII).
+This repository contains modifications to [MI0BOT's OpenHPSDR-Thetis]([https://github.com/mi0bot/OpenHPSDR-Thetis](https://github.com/mi0bot/OpenHPSDR-Thetis/releases/tag/v2.10.3.14)) (v2.10.3.14), specifically targeting Hermes-Lite 2 users with an LDG automatic antenna tuner connected via the [N2ADR HL2 IO Board](https://github.com/jimahlstrom/HL2IOBoard) using my modded code [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII).
 
 > [!CAUTION]
 > **YOU NEED A PULL UP RESISTOR ON J8 IN2 as per my instructions on my IO Board code for LDG tuner, othewhise, Thetis will start transmit right away. I will have a fix for this in the upcoming days on Thetis code to check that KEY line is HIGH before passing LOW. By default, all input are LOW at startup if you do not have a pullup resistor.**
