@@ -122,7 +122,7 @@ Thetis.exe → Thetis_original.exe
 > Your antivirus may flag an unsigned executable. You may need to add an exception. The source code (`console.cs`) is provided for full transparency.
 
 > [!NOTE]
-> It is possible that you will need to reconfigure Thetis (set skins, audio settings, etc) with this thetis.exe file, similar to a new install even though it is not. If you revert to your original thetis.exe file, all your previous settings should be there. To be safe, save your database settings from your current working version and worst case, reimport them to either Thetis version, they are both the same v2.10.3.14 so it won't cause any import problem.
+> It is possible that you will need to reconfigure Thetis (set skins, audio settings, etc) with this thetis.exe file, similar to a new install even though it is not. To be safe, save your database settings from your current working version and reimport it to either Thetis version, they are both the same v2.10.3.14 so it won't cause any import problem.
 
 ---
 
