@@ -6,7 +6,7 @@ This repository contains modifications to [MI0BOT's OpenHPSDR-Thetis](https://gi
 > **YOU NEED A PULL UP RESISTOR ON J8 IN2 as per my instructions on my IO Board code for LDG tuner, othewhise, Thetis will start transmit right away. I will have a fix for this in the upcoming days on Thetis code to check that KEY line is HIGH before passing LOW. By default, all input are LOW at startup if you do not have a pullup resistor.**
 
 > [!NOTE]
-> You do not need this modded version of Thetis to run my modded code [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII) to support a LDG tuner, with standard release of Thetis v2.10.3.14-HL2, you'll be limited to 8s auto tuning and no physical control from the LDG TUNE button.
+> You do not need this modded version of Thetis to run the [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII) code to support a LDG tuner, with standard release of Thetis v2.10.3.14-HL2, you'll be limited to 8s auto tuning and no physical control from the LDG TUNE button.
 
 ## Modifications Overview
 
