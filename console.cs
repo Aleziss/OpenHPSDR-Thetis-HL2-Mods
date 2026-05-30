@@ -25719,8 +25719,9 @@ namespace Thetis
         private int tune_timeout = 0;                               // MI0BOT: Auto tune timeout
         private int fault_timeout = 0;
         private int debug_last_status = -1;                         // DEBUG: track status changes                              
-        const byte TIMEOUT = 125;        // VA2CST: Auto tune timeout extended ~20s (was 50 = ~8s)
-        const byte FAULT_TIMEOUT = 50;   // VA2CST: Fault message display timeout ~8s (separated from TIMEOUT)
+        private bool key_was_high = false;                          // VA2CST: Tracks In2 state for HIGH-to-LOW transition detection
+        const byte TIMEOUT = 125;                                   // VA2CST: Auto tune timeout extended ~20s (was 50 = ~8s)
+        const byte FAULT_TIMEOUT = 50;                              // VA2CST: Fault message display timeout ~8s (separated from TIMEOUT)
         bool AutoTuningHL2(ProtocolEvent protocolEvent)
         {
             bool returnCode = false;
@@ -25755,7 +25756,7 @@ namespace Thetis
                             break;
 
                         case AutoTuneState.Fault:                  // Auto tune has had a fault time out the message
-                            if (fault_timeout++ >= FAULT_TIMEOUT)   // VA2CST: Uses separate FAULT_TIMEOUT constant
+                            if (fault_timeout++ >= FAULT_TIMEOUT)  // VA2CST: Uses separate FAULT_TIMEOUT constant
                             {
                                 infoBar.Warning("");
                                 auto_tuning = AutoTuneState.Idle;
@@ -25939,7 +25940,8 @@ namespace Thetis
                                 byte inputPins = (byte)ioBoard.readRegister(IOBoard.Registers.REG_INPUT_PINS);
 
                                 // VA2CST: Detect hardware TUNE button - In2 (KEY) LOW while idle
-                                if ((inputPins & 0x04) == 0 && auto_tuning == AutoTuneState.Idle)
+                                // key_was_high ensures In2 was HIGH before going LOW (pull-up required)
+                                if ((inputPins & 0x04) == 0 && auto_tuning == AutoTuneState.Idle && key_was_high)
                                 {
                                     // VA2CST: Hardware TUNE button - start tuning
                                     auto_tuning = AutoTuneState.WaitRF;
@@ -25968,6 +25970,8 @@ namespace Thetis
                                     AutoTuningHL2((ProtocolEvent)ioBoard.readRegister(IOBoard.Registers.REG_ANTENNA_TUNER));
                                 }
                                 SetupForm.UpdateIOLedStrip(MOX, inputPins);
+                                // VA2CST: Update KEY line state for transition detection
+                                key_was_high = (inputPins & 0x04) != 0;                           
                             }
                             break;
 
