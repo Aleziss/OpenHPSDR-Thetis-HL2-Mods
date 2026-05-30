@@ -2,11 +2,8 @@
 
 This repository contains modifications to [MI0BOT's OpenHPSDR-Thetis](https://github.com/mi0bot/OpenHPSDR-Thetis/releases/tag/v2.10.3.14) (v2.10.3.14), specifically targeting Hermes-Lite 2 users with an LDG automatic antenna tuner connected via the [N2ADR HL2 IO Board](https://github.com/jimahlstrom/HL2IOBoard) using my modded code [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII).
 
-> [!CAUTION]
-> **YOU NEED A PULL UP RESISTOR ON J8 IN2 as per my instructions on my IO Board code for LDG tuner, othewhise, Thetis will start transmit right away. I will have a fix for this in the upcoming days on Thetis code to check that KEY line is HIGH before passing LOW. By default, all input are LOW at startup if you do not have a pullup resistor.**
-
 > [!NOTE]
-> You do not need this modded version of Thetis to run the [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII) code to support a LDG tuner, with standard release of Thetis v2.10.3.14-HL2, you'll be limited to 8s auto tuning and no physical control from the LDG TUNE button.
+> You do not need this modded version of Thetis to run the [HL2IOBoard-LDG-AT1000-ProII](https://github.com/Aleziss/HL2IOBoard-LDG-AT1000-ProII) code to support a LDG tuner. With the standard release of Thetis v2.10.3.14-HL2, you'll be limited to ~8s auto tuning and no physical control from the LDG TUNE button.
 
 ## Modifications Overview
 
@@ -51,13 +48,21 @@ if (fault_timeout++ >= FAULT_TIMEOUT)
 
 **Root Cause:** Thetis reads `REG_INPUT_PINS` from the IO Board and only processes `REG_ANTENNA_TUNER` based on specific input pin states. The KEY line state (In2, bit 2) was never directly used to initiate tuning.
 
-**Fix Applied:** In the `UpdateIOBoard()` polling loop (`case 10`), after reading `REG_INPUT_PINS`, Thetis now checks if In2 (KEY line, bit 2) is LOW while in `Idle` state and activates RF directly:
+**Fix Applied:**
 
+**Step 1** — Add a private variable near `tune_timeout` and `fault_timeout` declarations:
+```csharp
+private bool key_was_high = false; // VA2CST: Tracks In2 state for HIGH-to-LOW transition detection
+                                   // Prevents false RF triggering if pull-up resistor is missing on J8 In2
+```
+
+**Step 2** — In the `UpdateIOBoard()` polling loop (`case 10`), after reading `REG_INPUT_PINS`, Thetis now checks if In2 (KEY line, bit 2) transitioned from HIGH to LOW while in `Idle` state:
 ```csharp
 byte inputPins = (byte)ioBoard.readRegister(IOBoard.Registers.REG_INPUT_PINS);
 
-// VA2CST: Detect hardware TUNE button - In2 (KEY) LOW while idle
-if ((inputPins & 0x04) == 0 && auto_tuning == AutoTuneState.Idle)
+// VA2CST: Detect hardware TUNE button - In2 (KEY) HIGH-to-LOW transition while idle
+// key_was_high ensures In2 was HIGH before going LOW (pull-up resistor required on J8 In2)
+if ((inputPins & 0x04) == 0 && auto_tuning == AutoTuneState.Idle && key_was_high)
 {
     auto_tuning = AutoTuneState.WaitRF;
     tune_timeout = 0;
@@ -74,10 +79,15 @@ else if ((inputPins & 0x04) == 0 && auto_tuning == AutoTuneState.Tuning)
     // VA2CST: Hardware TUNE in progress - keep RF going while KEY is LOW
     AutoTuningHL2(ProtocolEvent.RequestRF);
 }
+
+// ... existing fault and antenna tuner code ...
+
+SetupForm.UpdateIOLedStrip(MOX, inputPins);
+// VA2CST: Update KEY line state for HIGH-to-LOW transition detection on next cycle
+key_was_high = (inputPins & 0x04) != 0;
 ```
 
-Additionally, `AutoTuningHL2()` was updated to handle `RequestRF` when in `Idle` state:
-
+**Step 3** — In `AutoTuningHL2()`, add handling for `RequestRF` when in `Idle` state:
 ```csharp
 case ProtocolEvent.RequestRF:
     switch (auto_tuning)
@@ -95,6 +105,9 @@ case ProtocolEvent.RequestRF:
         // ... existing cases unchanged
     }
 ```
+
+> [!IMPORTANT]
+> A **4.7kΩ pull-up resistor to 5V (P3 on IO Board)** is required on J8 In2 (KEY line). Without it, In2 floats LOW at startup and Thetis will not trigger tuning since `key_was_high` will remain `false` until In2 is seen HIGH at least once.
 
 ---
 
@@ -129,9 +142,9 @@ Thetis.exe → Thetis_original.exe
 
 ---
 
-## Video demonstration
+## Video Demonstration
 
-You can see a demontration of the modded code [HERE](https://youtu.be/9eE7b4Y-6QY?si=WgPXGFOQaXzIzFvE)
+You can see a demonstration of the modded code [HERE](https://youtu.be/9eE7b4Y-6QY?si=WgPXGFOQaXzIzFvE)
 
 ---
 
@@ -142,8 +155,10 @@ If MI0BOT releases a new version of Thetis, the changes can be reapplied to `con
 1. Locating the `AutoTuningHL2()` function
 2. Changing `const byte TIMEOUT = 50` to `const byte TIMEOUT = 125` and adding `const byte FAULT_TIMEOUT = 50`
 3. Updating `if (fault_timeout++ >= TIMEOUT)` to `if (fault_timeout++ >= FAULT_TIMEOUT)`
-4. Adding the `case AutoTuneState.Idle` block in `ProtocolEvent.RequestRF`
-5. Adding the In2 detection logic in the `UpdateIOBoard()` polling loop
+4. Adding `private bool key_was_high = false` near the other private variables
+5. Adding the `case AutoTuneState.Idle` block in `ProtocolEvent.RequestRF`
+6. Adding the In2 detection logic with `key_was_high` in the `UpdateIOBoard()` polling loop
+7. Adding `key_was_high = (inputPins & 0x04) != 0` at the end of the `if (status == 0)` block
 
 Refer to the provided `console.cs` for exact implementation details.
 
